@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}Create Account — CyberShield{% endblock %}
+
+{% block content %}
+<main class="auth-page">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <span class="logo-icon">🛡</span> CyberShield
+        </div>
+        <h1>Create your account</h1>
+        <p class="auth-subtitle">Start your authorized security assessment lab</p>
+
+        <div id="general-alert" class="auth-alert" style="display: none;"></div>
+
+        <form id="signup-form" method="POST" action="{{ url_for('signup') }}" novalidate>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input id="name" name="name" type="text"
+                       placeholder="Alex Mercer" value="{{ name or '' }}" autofocus required autocomplete="name">
+                <span id="name-error" class="field-error" style="display: none;"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email"
+                       placeholder="you@example.com" value="{{ email or '' }}" required autocomplete="email">
+                <span id="email-error" class="field-error" style="display: none;"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-field">
+                    <input id="password" name="password" type="password"
+                           placeholder="At least 8 chars, 1 uppercase, 1 number" required autocomplete="new-password">
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('password', this)">
+                        <svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <span id="password-error" class="field-error" style="display: none;"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <div class="password-field">
+                    <input id="confirm_password" name="confirm_password" type="password"
+                           placeholder="Confirm your password" required autocomplete="new-password">
+                    <button type="button" class="password-toggle" aria-label="Toggle confirm password visibility" onclick="togglePasswordVisibility('confirm_password', this)">
+                        <svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <span id="confirm_password-error" class="field-error" style="display: none;"></span>
+            </div>
+
+            <button id="submit-btn" class="primary-btn" type="submit">
+                Create Account
+            </button>
+        </form>
+
+        <p class="signup">
+            Already have an account? <a href="{{ url_for('signin') }}">Sign in</a>
+        </p>
+    </div>
+</main>
+
+<script>
+function togglePasswordVisibility(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = `<svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+    } else {
+        input.type = 'password';
+        btn.innerHTML = `<svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    }
+}
+
+document.getElementById('signup-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const submitBtn = document.getElementById('submit-btn');
+    const alertBox = document.getElementById('general-alert');
+
+    // Reset alert and errors
+    alertBox.style.display = 'none';
+    alertBox.className = 'auth-alert';
+    alertBox.textContent = '';
+
+    const errorFields = ['name-error', 'email-error', 'password-error', 'confirm_password-error'];
+    errorFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = '';
+            el.style.display = 'none';
+        }
+    });
+    [nameInput, emailInput, passwordInput, confirmInput].forEach(inp => inp.classList.remove('is-invalid'));
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmInput.value;
+
+    let hasError = false;
+    let firstInvalidInput = null;
+
+    function setFieldError(fieldId, errorId, message) {
+        const errEl = document.getElementById(errorId);
+        const inpEl = document.getElementById(fieldId);
+        if (errEl) {
+            errEl.textContent = message;
+            errEl.style.display = 'block';
+        }
+        if (inpEl) {
+            inpEl.classList.add('is-invalid');
+            if (!firstInvalidInput) firstInvalidInput = inpEl;
+        }
+        hasError = true;
+    }
+
+    if (!name) {
+        setFieldError('name', 'name-error', 'Please enter your name.');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+        setFieldError('email', 'email-error', 'Please enter your email.');
+    } else if (!emailRegex.test(email)) {
+        setFieldError('email', 'email-error', 'Please enter a valid email address.');
+    }
+
+    const hasUpper = /[A-Z]/.test(password);
+    const hasDigit = /[0-9]/.test(password);
+    if (!password) {
+        setFieldError('password', 'password-error', 'Please enter your password.');
+    } else if (password.length < 8 || !hasUpper || !hasDigit) {
+        setFieldError('password', 'password-error', 'Password must meet the required requirements.');
+    }
+
+    if (!confirmPassword) {
+        setFieldError('confirm_password', 'confirm_password-error', 'Please confirm your password.');
+    } else if (password !== confirmPassword) {
+        setFieldError('confirm_password', 'confirm_password-error', 'Passwords do not match.');
+    }
+
+    if (hasError) {
+        if (firstInvalidInput) firstInvalidInput.focus();
+        return;
+    }
+
+    // Loading State
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Creating account...';
+
+    try {
+        const response = await fetch('{{ url_for("signup") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                password: password,
+                confirm_password: confirmPassword
+            })
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (response.ok && data && data.success) {
+            // Success
+            alertBox.className = 'auth-alert auth-alert-success';
+            alertBox.textContent = data.message || 'Account created successfully. You can now sign in.';
+            alertBox.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = data.redirect_url || '{{ url_for("signin") }}';
+            }, 1000);
+        } else {
+            // Failed
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+
+            if (data && data.field_errors) {
+                for (const [key, msg] of Object.entries(data.field_errors)) {
+                    const errEl = document.getElementById(key + '-error');
+                    const inpEl = document.getElementById(key);
+                    if (errEl) {
+                        errEl.textContent = msg;
+                        errEl.style.display = 'block';
+                    }
+                    if (inpEl) inpEl.classList.add('is-invalid');
+                }
+            }
+
+            if (data && data.error) {
+                alertBox.className = 'auth-alert auth-alert-error';
+                alertBox.textContent = data.error;
+                alertBox.style.display = 'block';
+            } else if (!data || !data.field_errors) {
+                alertBox.className = 'auth-alert auth-alert-error';
+                alertBox.textContent = 'Unable to create account. Please try again.';
+                alertBox.style.display = 'block';
+            }
+        }
+    } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        alertBox.className = 'auth-alert auth-alert-error';
+        alertBox.textContent = 'Unable to create account. Please try again.';
+        alertBox.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Defense — CyberShield{% endblock %}
+{% block content %}
+<main class="page">
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">DEFENSIVE CONTROL</p>
+            <h1>Defense Simulator</h1>
+            <p>Test a simple password security policy.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <form method="POST" class="tool-form">
+            <label for="username">Username</label>
+            <input id="username" name="username" placeholder="admin" value="{{ request.form.get('username', '') }}" required>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" placeholder="StrongPassword1" value="{{ request.form.get('password', '') }}" required>
+            <button class="primary-btn" type="submit">Apply Defense</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="panel result">
+        <span class="risk {{ 'low' if result.status == 'SECURE' else 'medium' }}">{{ result.status }}</span>
+        <h2>{{ result.message }}</h2>
+        <p>{{ result.lesson }}</p>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Report — CyberShield{% endblock %}
+{% block content %}
+<main class="page">
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">SECURITY REPORT</p>
+            <h1>Assessment Report</h1>
+            <p>Current results from this local demo session.</p>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card"><span>Total Scans</span><strong>{{ scans }}</strong></div>
+        <div class="stat-card"><span>Vulnerabilities</span><strong>{{ vulnerabilities }}</strong></div>
+        <div class="stat-card"><span>High Risk</span><strong class="danger-text">{{ high_risk }}</strong></div>
+        <div class="stat-card"><span>Fixed Issues</span><strong class="success-text">{{ fixed }}</strong></div>
+    </div>
+
+    <div class="stats" style="margin-top: 16px;">
+        <div class="stat-card"><span>SQL Injection Tests</span><strong>{{ sql_injection_tests }}</strong></div>
+        <div class="stat-card"><span>SQL Injection Found</span><strong class="danger-text">{{ sql_injection_found }}</strong></div>
+        <div class="stat-card"><span>Last SQLi Result</span><strong>{{ last_sql_injection }}</strong></div>
+    </div>
+
+    <div class="panel">
+        <h2>Latest Target</h2>
+        <p style="font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--green);">{{ last_target }}</p>
+        <p class="muted">Authorized local testing only.</p>
+    </div>
+</main>
+{% endblock %}

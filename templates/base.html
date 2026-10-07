@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CyberShield{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% if session.get("signed_in") %}
+<header class="topbar">
+    <a class="logo" href="{{ url_for('home') }}">
+        <span class="logo-icon">🛡</span> CyberShield
+    </a>
+    <nav>
+        <a class="{% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">Dashboard</a>
+        <a class="{% if request.endpoint == 'recon' %}active{% endif %}" href="{{ url_for('recon') }}">Recon</a>
+        <a class="{% if request.endpoint == 'scanner' %}active{% endif %}" href="{{ url_for('scanner') }}">Scanner</a>
+        <a class="{% if request.endpoint == 'vulnerability' %}active{% endif %}" href="{{ url_for('vulnerability') }}">Vulnerabilities</a>
+        <a class="{% if request.endpoint == 'sql_injection' %}active{% endif %}" href="{{ url_for('sql_injection') }}">SQL Injection</a>
+        <a class="{% if request.endpoint == 'attack' %}active{% endif %}" href="{{ url_for('attack') }}">Attack Simulator</a>
+        <a class="{% if request.endpoint == 'defense' %}active{% endif %}" href="{{ url_for('defense') }}">Defense</a>
+        <a class="{% if request.endpoint == 'report' %}active{% endif %}" href="{{ url_for('report') }}">Report</a>
+        <span class="nav-user">{{ session.get('user_name') or session.get('email') }}</span>
+        <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+</header>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-wrap">
+    {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+</body>
+</html>

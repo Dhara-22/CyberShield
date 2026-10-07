@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}SQL Injection — CyberShield{% endblock %}
+{% block content %}
+<main class="page">
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">SQL SECURITY</p>
+            <h1>SQL Injection</h1>
+            <p>Test username and password input.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <form method="POST" class="tool-form">
+            <label for="username">Username</label>
+            <input id="username" name="username" placeholder="admin" value="{{ request.form.get('username', '') }}" required>
+
+            <label for="password" style="margin-top: 14px;">Password</label>
+            <input id="password" name="password" type="text" placeholder="admin123" value="{{ request.form.get('password', '') }}" required>
+
+            <button class="danger-btn" type="submit">Run Test</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="panel result">
+        <span class="risk {{ 'high' if result.injection_detected else 'low' }}">{{ result.status }}</span>
+        <h2>{{ 'SQL Injection Detected' if result.injection_detected else 'No SQL Injection Detected' }}</h2>
+
+        {% if result.vulnerable_error %}
+        <p class="muted">{{ result.vulnerable_error }}</p>
+        {% endif %}
+
+        <div class="findings" style="margin-top: 16px;">
+            <div class="finding">
+                <div class="finding-top">
+                    <h3>Vulnerable Query</h3>
+                    <span class="risk {{ 'high' if result.injection_detected else 'low' }}">{{ result.vulnerable_rows|length }} row(s)</span>
+                </div>
+                <code class="mono">{{ result.vulnerable_sql }}</code>
+                {% if result.vulnerable_rows %}
+                <div class="table-wrap" style="margin-top: 12px;">
+                    <table>
+                        <thead><tr><th>ID</th><th>Username</th><th>Role</th></tr></thead>
+                        <tbody>
+                        {% for row in result.vulnerable_rows %}
+                            <tr><td>{{ row.id }}</td><td>{{ row.username }}</td><td>{{ row.role }}</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="finding">
+                <div class="finding-top">
+                    <h3>Secure Query</h3>
+                    <span class="risk low">{{ result.secure_rows|length }} row(s)</span>
+                </div>
+                <code class="mono">{{ result.secure_sql }}</code>
+                {% if result.secure_rows %}
+                <div class="table-wrap" style="margin-top: 12px;">
+                    <table>
+                        <thead><tr><th>ID</th><th>Username</th><th>Role</th></tr></thead>
+                        <tbody>
+                        {% for row in result.secure_rows %}
+                            <tr><td>{{ row.id }}</td><td>{{ row.username }}</td><td>{{ row.role }}</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

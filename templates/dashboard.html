@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — CyberShield{% endblock %}
+
+{% block content %}
+<main class="page">
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">SECURITY OVERVIEW</p>
+            <h1>Dashboard</h1>
+            <p>Welcome, <span style="color: var(--text); font-weight: 500;">{{ user_name }}</span>. Monitor your authorized security testing activity.</p>
+        </div>
+        <a class="primary-btn small" href="{{ url_for('scanner') }}">Start New Scan</a>
+    </div>
+
+    <section class="stats">
+        <div class="stat-card"><span>Total Scans</span><strong>{{ scans }}</strong></div>
+        <div class="stat-card"><span>Vulnerabilities</span><strong>{{ vulnerabilities }}</strong></div>
+        <div class="stat-card"><span>High Risk</span><strong class="danger-text">{{ high_risk }}</strong></div>
+        <div class="stat-card"><span>Fixed Issues</span><strong class="success-text">{{ fixed }}</strong></div>
+    </section>
+
+    <section class="grid-2">
+        <div class="panel">
+            <p class="eyebrow">LAB TARGET</p>
+            <h2>Local Security Lab</h2>
+            <div class="target-row"><span>Target</span><strong>{{ last_target }}</strong></div>
+            <div class="target-row"><span>Environment</span><strong>Authorized Lab</strong></div>
+            <div class="target-row"><span>Status</span><strong class="success-text">● Online</strong></div>
+        </div>
+
+        <div class="panel">
+            <p class="eyebrow">QUICK ACTIONS</p>
+            <h2>Security Tools</h2>
+            <div class="quick-actions">
+                <a href="{{ url_for('recon') }}">Reconnaissance</a>
+                <a href="{{ url_for('scanner') }}">Port Scanner</a>
+                <a href="{{ url_for('vulnerability') }}">Vulnerability Check</a>
+                <a href="{{ url_for('report') }}">View Report</a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Scanner — CyberShield{% endblock %}
+{% block content %}
+<main class="page">
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">NETWORK SCANNING</p>
+            <h1>Port Scanner</h1>
+            <p>Scan common TCP ports on an authorized lab target.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <form method="POST" class="tool-form">
+            <label for="target">Target</label>
+            <input id="target" name="target" placeholder="127.0.0.1" value="{{ request.form.get('target', '') }}" required>
+            <button class="primary-btn" type="submit">Start Scan</button>
+        </form>
+    </div>
+
+    {% if results %}
+    <div class="panel">
+        <div class="panel-title">
+            <h2>Scan Results</h2>
+            <span class="badge">{{ results|length }} ports checked</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Port</th>
+                        <th>Service</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in results %}
+                <tr>
+                    <td class="mono">{{ item.port }}</td>
+                    <td>{{ item.service }}</td>
+                    <td><span class="status {{ 'open' if item.status == 'OPEN' else ('invalid' if item.status == 'INVALID' else 'closed') }}">{{ item.status }}</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}
